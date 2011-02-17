@@ -1,0 +1,32 @@
+[
+   {
+        "id": "username",
+        "type": "text",
+        "label": "Username",
+        "default": "" 
+    },
+    {
+        "id": "album_sort_order",
+        "type": "enum",
+        "label": "Sort order for albums",
+        "values": [
+            "By Date Ascending",
+            "By Date Descending",
+            "A to Z",
+            "Z to A"
+        ],
+        "default": "By Date Ascending" 
+    },
+    {
+        "id": "photo_sort_order",
+        "type": "enum",
+        "label": "Sort order for pictures",
+        "values": [
+            "By Date Ascending",
+            "By Date Descending",
+            "A to Z",
+            "Z to A"
+        ],
+        "default": "By Date Ascending" 
+    }
+]
