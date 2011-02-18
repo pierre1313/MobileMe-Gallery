@@ -10,6 +10,7 @@
         "type": "enum",
         "label": "Sort order for albums",
         "values": [
+            "Original order",
             "By Date Ascending",
             "By Date Descending",
             "A to Z",
@@ -22,6 +23,7 @@
         "type": "enum",
         "label": "Sort order for pictures",
         "values": [
+            "Original order",
             "By Date Ascending",
             "By Date Descending",
             "A to Z",

@@ -1,4 +1,3 @@
-
 PHOTOS_PREFIX = "/photos/mobilemegallery"
 
 NAME = L('MobileMe Gallery')
@@ -17,6 +16,7 @@ def Start():
 
     Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
     Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
+    Plugin.AddViewGroup("Pictures", viewMode="Pictures", mediaType="items")
 
     MediaContainer.art = R(ART)
     MediaContainer.title1 = NAME
@@ -39,7 +39,14 @@ def getThumb(url):
     return DataObject(data, 'image/jpeg')
   except:
     return Redirect(R(ICON))
-    
+
+def getBkgnd(url):
+  try:
+    data = HTTP.Request(url, cacheTime=CACHE_1WEEK).content
+    return DataObject(data, 'image/jpeg')
+  except:
+    return Redirect(R(ART)) 
+ 
 def ParseGallery(sender,query=None):
   if id == None:
     return MessageContainer("Error","Please enter a valid username in the Prefernce menu")
@@ -53,7 +60,8 @@ def ParseGallery(sender,query=None):
   for album in JsonObject['records']:
     if album['type'] == 'Album' or album['type'] == 'ApertureAlbum':
       albumthumb = album['keyImagePath'].replace('#','/')+'/web.jpg'
-      dir.Append(Function(DirectoryItem(ParseAlbum,title = album['title']+' ('+str(album['numPhotos'])+')',subtitle=album['updated'],thumb=albumthumb),id=album['url']))
+      albumkey = album['keyImagePath'].replace('#','/')+'/large.jpg'
+      dir.Append(Function(DirectoryItem(ParseAlbum,title = album['title']+' ('+str(album['numPhotos'])+')',subtitle=album['updated'],thumb=albumthumb, art=albumkey),id=album['url']))
 
   if Prefs['album_sort_order'] == "By Date Descending": 
     dir.Reverse()
@@ -64,18 +72,23 @@ def ParseGallery(sender,query=None):
   return dir
   
 def ParseAlbum(sender,id):
-  dir = MediaContainer(viewGroup="List")
+  dir = MediaContainer(viewGroup="Pictures", art=sender.art)
   JsonObject = JSON.ObjectFromURL(ALBUM_URL % id)
   for pic in JsonObject['records']:
     if pic['type'] == 'Photo':
-      dir.Append(PhotoItem(pic['largeImageUrl'],title = pic['title'],subtitle=pic['photoDate'],thumb=pic['squareDerivativeUrl']))
-      
+      try: 
+        dir.Append(PhotoItem(pic['largeImageUrl'],title = pic['title'],subtitle=pic['photoDate'],thumb=pic['squareDerivativeUrl']))
+      except:
+        dir.Append(PhotoItem(pic['webImageUrl'],title = pic['title'],subtitle=pic['photoDate'],thumb=pic['squareDerivativeUrl']))
+        
+  if Prefs['photo_sort_order'] == "By Date Ascending": 
+    dir.Sort('subtitle') 
   if Prefs['photo_sort_order'] == "By Date Descending": 
-    dir.Reverse()
-  if Prefs['photo_sort_order'] == "A to Z" or Prefs['photo_sort_order'] == "Z to A": 
+    dir.Sort('subtitle').Reverse()
+  if Prefs['photo_sort_order'] == "A to Z": 
     dir.Sort('title')
   if Prefs['photo_sort_order'] == "Z to A": 
-    dir.Reverse()      
+    dir.Sort('title').Reverse()      
   return dir
 
      
